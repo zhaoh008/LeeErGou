@@ -8,7 +8,7 @@
 
 int main(void)
 {
-    std::locale::global(std::locale(""));
+    SetConsoleOutputCP(CP_UTF8);
 
     GLFWwindow* window;
 
