@@ -6,7 +6,7 @@
 
 #include <GLFW/glfw3.h>
 
-int main(void)
+int main()
 {
     SetConsoleOutputCP(CP_UTF8);
 
@@ -17,7 +17,7 @@ int main(void)
         return -1;
 
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "LeeErGou Engine", NULL, NULL);
+    window = glfwCreateWindow(640, 480, "LeeErGou Engine", nullptr, nullptr);
     if (!window)
     {
         glfwTerminate();
