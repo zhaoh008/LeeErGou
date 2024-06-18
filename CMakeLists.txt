@@ -7,6 +7,8 @@ if(MSVC)
     add_compile_options(/utf-8)
 endif()
 
+set(CMAKE_CXX_STANDARD 17)
+
 set(LIB_HELLO Hello)
 
 add_library(${LIB_HELLO} SHARED src/Hello.cpp
@@ -19,8 +21,9 @@ target_compile_definitions(${LIB_HELLO} PUBLIC BUILD_DLL)
 
 
 add_executable(${PROJECT_NAME} src/App.cpp
+        src/glad.c
 )
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include/stb)
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
 target_sources(${PROJECT_NAME} PRIVATE resource/appicon.rc)
 
