@@ -47,6 +47,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE  ${OPENGL_LIBRARY})
 find_package(Stb REQUIRED)
 target_include_directories(${PROJECT_NAME} PRIVATE ${Stb_INCLUDE_DIR})
 
+find_package(glm CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE glm::glm-header-only)
 
 ## install
 
@@ -55,6 +57,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${Stb_INCLUDE_DIR})
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 install(DIRECTORY resource/
         DESTINATION resource
+        FILES_MATCHING
+        PATTERN "*")
+install(DIRECTORY shader/
+        DESTINATION shader
         FILES_MATCHING
         PATTERN "*")
 

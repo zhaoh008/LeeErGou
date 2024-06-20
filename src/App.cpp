@@ -5,6 +5,9 @@
 #include "../shader/Shader.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 
 //设置窗口图标
 void SetIcon(GLFWwindow *window);
@@ -18,6 +21,18 @@ const unsigned int SCR_HEIGHT = 600;
 
 
 int main() {
+
+
+
+    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+    // 译注：下面就是矩阵初始化的一个例子，如果使用的是0.9.9及以上版本
+    // 下面这行代码就需要改为:
+    // glm::mat4 trans = glm::mat4(1.0f)
+    // 之后将不再进行提示
+    auto trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    vec = trans * vec;
+    spdlog::info("x:{},y:{},z:{}", vec.x , vec.y,  vec.z);
 
     // glfw: initialize and configure
     // ------------------------------
@@ -111,7 +126,7 @@ int main() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     // 加载并生成纹理
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(R"(D:\CPlusPlusProgram\LeeErGou\shader\Texture\container.jpg)", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load(R"(..\shader\Texture\container.jpg)", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
