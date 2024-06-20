@@ -22,6 +22,8 @@ target_compile_definitions(${LIB_HELLO} PUBLIC BUILD_DLL)
 
 add_executable(${PROJECT_NAME} src/App.cpp
         src/glad.c
+        shader/Shader.cpp
+        shader/Shader.h
 )
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
