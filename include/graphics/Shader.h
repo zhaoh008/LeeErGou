@@ -3,8 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-#include <glad/glad.h>
-#include <spdlog/spdlog.h>
+#include "glad/glad.h"
+#include "spdlog/spdlog.h"
 
 class Shader {
 public:
@@ -50,7 +50,7 @@ public:
     // Utility function for checking shader compilation/linking errors.
     void checkCompileErrors(GLuint shader, const std::string& type) ;
 private:
-    bool is_file_exist(const std::string& name) {
+    static bool is_file_exist(const std::string& name) {
         std::ifstream file(name.c_str());
         return file.good();
     }

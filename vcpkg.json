@@ -23,5 +23,8 @@
   }, {
     "name" : "glm",
     "version>=" : "1.0.1#2"
+  }, {
+    "name" : "boost-filesystem",
+    "version>=" : "1.85.0#2"
   } ]
 }

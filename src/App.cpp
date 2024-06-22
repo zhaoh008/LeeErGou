@@ -1,11 +1,13 @@
 #include <glad/glad.h>
+#include "stb_impl.c"
 #include <windows.h>
 #include "spdlog/spdlog.h"
-#include "stb_impl.c"
-#include "../shader/Shader.h"
+#include "graphics/Shader.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <boost/filesystem.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 
@@ -24,15 +26,7 @@ int main() {
 
 
 
-    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-    // 译注：下面就是矩阵初始化的一个例子，如果使用的是0.9.9及以上版本
-    // 下面这行代码就需要改为:
-    // glm::mat4 trans = glm::mat4(1.0f)
-    // 之后将不再进行提示
-    auto trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-    vec = trans * vec;
-    spdlog::info("x:{},y:{},z:{}", vec.x , vec.y,  vec.z);
+
 
     // glfw: initialize and configure
     // ------------------------------
@@ -66,7 +60,7 @@ int main() {
         spdlog::info("Failed to initialize GLAD");
         return -1;
     }
-    Shader shader(R"(D:\CPlusPlusProgram\LeeErGou\shader\GLSL\VertexShader\first.vert)",R"(D:\CPlusPlusProgram\LeeErGou\shader\GLSL\FragmentShader\first.frag)");
+    Shader shader(boost::filesystem::absolute("../shader/GLSL/first.vert").string().c_str(),boost::filesystem::absolute("../shader/GLSL/first.frag").string().c_str());
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -115,18 +109,23 @@ int main() {
     glBindVertexArray(0);
 
 
-    //UV
-    unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
+    // load and create a texture
+    // -------------------------
+    unsigned int texture1, texture2;
+    // texture 1
+    // ---------
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    // set the texture wrapping parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载并生成纹理
+    // load image, create texture and generate mipmaps
     int width, height, nrChannels;
-    unsigned char *data = stbi_load(R"(..\shader\Texture\container.jpg)", &width, &height, &nrChannels, 0);
+    stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+    unsigned char *data = stbi_load(boost::filesystem::absolute("../assets/textures/container.jpg").string().c_str(), &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -137,7 +136,33 @@ int main() {
         std::cout << "Failed to load texture" << std::endl;
     }
     stbi_image_free(data);
+    // texture 2
+    // ---------
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    // set the texture wrapping parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    // set texture filtering parameters
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load image, create texture and generate mipmaps
+    data = stbi_load(boost::filesystem::absolute("../assets/icon/Dog.png").string().c_str(), &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        // note that the awesomeface.png has transparency and thus an alpha channel, so make sure to tell OpenGL the data type is of GL_RGBA
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
 
+    shader.use();
+    shader.setInt("texture1", 0);
+    shader.setInt("texture2", 1);
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -157,10 +182,23 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // bind Texture
-        glBindTexture(GL_TEXTURE_2D, texture);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
 
+
+        glm::mat4 trans(1);
+        trans =glm::translate(trans,glm::vec3(0.5,-0.5,0));
+        trans = glm::rotate(trans, float(glfwGetTime()),glm::vec3(0.0, 0.0, 1.0));
+        trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+        unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
         // render container
         shader.use();
+
+
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -184,7 +222,7 @@ int main() {
 
 void SetIcon(GLFWwindow *window) {
     int width = 36, height = 36, channels = 0;
-    unsigned char *image = stbi_load("..\\resource\\Dog.png", &width, &height, &channels, 4);
+    unsigned char *image = stbi_load(boost::filesystem::absolute("../assets/icon/Dog.png").string().c_str(), &width, &height, &channels, 4);
 
     if (image) {
         GLFWimage icons[1];
