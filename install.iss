@@ -7,15 +7,15 @@ OutputDir=.\Output
 OutputBaseFilename=LeeErGou_installer
 Compression=lzma
 SolidCompression=yes
-SetupIconFile=.\resource\Dog.ico
+SetupIconFile=./assets/icon/Dog.ico
 
 [Files]
 ; 将可执行文件和 DLLs 添加到安装包的 bin 目录
 Source: ".\cmake-build-release\install\bin\LeeErGou.exe"; DestDir: "{app}\bin"; Flags: ignoreversion
 Source: ".\cmake-build-release\install\bin\*.dll"; DestDir: "{app}\bin"; Flags: ignoreversion
 ; 将资源文件添加到安装包的 resource 目录
-Source: ".\resource\*"; DestDir: "{app}\resource"; Flags: ignoreversion recursesubdirs
-
+Source: ".\assets\*"; DestDir: "{app}\assets"; Flags: ignoreversion recursesubdirs
+Source: ".\shader\*"; DestDir: "{app}\shader"; Flags: ignoreversion recursesubdirs
 
 [Icons]
 ; 在开始菜单创建快捷方式指向 bin 目录下的 EXE
