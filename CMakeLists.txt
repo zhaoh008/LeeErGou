@@ -13,6 +13,8 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_executable(${PROJECT_NAME} src/App.cpp
         src/graphics/Shader.cpp
+        src/graphics/Textur.cpp
+        src/stb_impl.cpp
 )
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
 
